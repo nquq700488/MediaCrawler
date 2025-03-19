@@ -531,3 +531,10 @@ CREATE TABLE `zhihu_creator` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `idx_zhihu_creator_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='知乎创作者';
+
+
+-- add column `like_count` to douyin_aweme_comment
+alter table douyin_aweme_comment add column `like_count` varchar(255) NOT NULL DEFAULT '0' COMMENT '点赞数';
+
+alter table xhs_note add column xsec_token varchar(50) default null comment '签名算法';
+alter table douyin_aweme_comment add column `pictures` varchar(500) NOT NULL DEFAULT '' COMMENT '评论图片列表';

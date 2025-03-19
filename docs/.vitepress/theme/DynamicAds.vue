@@ -11,9 +11,9 @@ const fetchAds = async () => {
   return [
     {
       id: 1,
-      imageUrl: 'https://dashboard.ipcola.com/assets/logo-blue-44f7d385.png',
-      landingUrl: 'https://dashboard.ipcola.com/register?referral_code=atxtupzfjhpbdbl',
-      text: '⚡️【IPCola全球独家海外IP代理】⚡️新鲜的原生住宅代理，超高性价比，超多稀缺国家'
+      imageUrl: 'https://github.com/NanmiCoder/MediaCrawler/raw/main/docs/static/images/auto_test.png',
+      landingUrl: 'https://item.jd.com/10124939676219.html',
+      text: '给好朋友虫师新书站台推荐 - 基于Python的自动化测试框架设计'
     }
   ]
 }
