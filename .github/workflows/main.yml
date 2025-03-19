@@ -22,6 +22,20 @@ jobs:
       - name: Fetch upstream
         run: git fetch upstream
 
+      - name: Get current user info
+        id: get_user
+        run: |
+          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/users/${{ github.actor }})
+          echo "User info: $response"
+          echo "username=$(echo $response | jq -r '.login')" >> $GITHUB_OUTPUT
+          echo "email=$(echo $response | jq -r '.email')" >> $GITHUB_OUTPUT
+
+      - name: Set up Git identity
+        run: |
+          git config --global user.name "${{ steps.get_user.outputs.username }}"
+          git config --global user.email "${{ steps.get_user.outputs.email }}"
+
       - name: Merge upstream
         run: |
           git checkout main
