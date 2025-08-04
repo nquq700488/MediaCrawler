@@ -8,7 +8,6 @@
 # 详细许可条款请参阅项目根目录下的LICENSE文件。
 # 使用本代码即表示您同意遵守上述原则和LICENSE中的所有条款。
 
-
 # 基础配置
 PLATFORM = "xhs"  # 平台，xhs | dy | ks | bili | wb | tieba | zhihu
 KEYWORDS = "编程副业,编程兼职"  # 关键词搜索配置，以英文逗号分隔
@@ -24,7 +23,7 @@ ENABLE_IP_PROXY = False
 IP_PROXY_POOL_COUNT = 2
 
 # 代理IP提供商名称
-IP_PROXY_PROVIDER_NAME = "kuaidaili"
+IP_PROXY_PROVIDER_NAME = "kuaidaili"  # kuaidaili | wandouhttp
 
 # 设置为True不会打开浏览器（无头浏览器）
 # 设置False会打开一个浏览器
@@ -77,8 +76,8 @@ CRAWLER_MAX_NOTES_COUNT = 200
 # 并发爬虫数量控制
 MAX_CONCURRENCY_NUM = 1
 
-# 是否开启爬图片模式, 默认不开启爬图片
-ENABLE_GET_IMAGES = False
+# 是否开启爬媒体模式（包含图片或视频资源），默认不开启爬媒体
+ENABLE_GET_MEIDAS = False
 
 # 是否开启爬评论模式, 默认开启爬评论
 ENABLE_GET_COMMENTS = True
