@@ -243,16 +243,6 @@ uv run main.py --platform xhs --lt qrcode --type search --save_data_option db
 
 ### 💰 赞助商展示
 
-<a href="https://www.swiftproxy.net/?ref=nanmi">
-<img src="docs/static/images/img_5.png">
-<br>
-Swiftproxy - 90M+ 全球高质量纯净住宅IP，注册可领免费 500MB 测试流量，动态流量不过期！
-> 专属折扣码：**GHB5** 立享九折优惠！
-</a>
-
-<br>
-<br>
-
 <a href="https://h.wandouip.com">
 <img src="docs/static/images/img_8.jpg">
 <br>
@@ -266,7 +256,7 @@ Swiftproxy - 90M+ 全球高质量纯净住宅IP，注册可领免费 500MB 测�
 成为赞助者，可以将您的产品展示在这里，每天获得大量曝光！
 
 **联系方式**：
-- 微信：`yzglan`
+- 微信：`relakkes`
 - 邮箱：`relakkes@gmail.com`
 
 
