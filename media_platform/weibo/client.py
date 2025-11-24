@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+# Copyright (c) 2025 relakkes@gmail.com
+#
+# This file is part of MediaCrawler project.
+# Repository: https://github.com/NanmiCoder/MediaCrawler/blob/main/media_platform/weibo/client.py
+# GitHub: https://github.com/NanmiCoder
+# Licensed under NON-COMMERCIAL LEARNING LICENSE 1.1
+#
+
 # 声明：本代码仅供学习和研究目的使用。使用者应遵守以下原则：
 # 1. 不得用于任何商业用途。
 # 2. 使用时应遵守目标平台的使用条款和robots.txt规则。
@@ -23,6 +32,7 @@ from urllib.parse import parse_qs, unquote, urlencode
 import httpx
 from httpx import Response
 from playwright.async_api import BrowserContext, Page
+from tenacity import retry, stop_after_attempt, wait_fixed
 
 import config
 from tools import utils
@@ -50,6 +60,7 @@ class WeiboClient:
         self.cookie_dict = cookie_dict
         self._image_agent_host = "https://i1.wp.com/"
 
+    @retry(stop=stop_after_attempt(5), wait=wait_fixed(3))
     async def request(self, method, url, **kwargs) -> Union[Response, Dict]:
         enable_return_response = kwargs.pop("return_response", False)
         async with httpx.AsyncClient(proxy=self.proxy) as client:
@@ -58,7 +69,16 @@ class WeiboClient:
         if enable_return_response:
             return response
 
-        data: Dict = response.json()
+        try:
+            data: Dict = response.json()
+        except json.decoder.JSONDecodeError:
+            # issue: #771 搜索接口会报错432， 多次重试 + 更新 h5 cookies
+            utils.logger.error(f"[WeiboClient.request] request {method}:{url} err code: {response.status_code} res:{response.text}")
+            await self.playwright_page.goto(self._host)
+            await asyncio.sleep(2)
+            await self.update_cookies(browser_context=self.playwright_page.context)
+            raise DataFetchError(f"get response code error: {response.status_code}")
+
         ok_code = data.get("ok")
         if ok_code == 0:  # response error
             utils.logger.error(f"[WeiboClient.request] request {method}:{url} err, res:{data}")
@@ -99,10 +119,24 @@ class WeiboClient:
             ping_flag = False
         return ping_flag
 
-    async def update_cookies(self, browser_context: BrowserContext):
-        cookie_str, cookie_dict = utils.convert_cookies(await browser_context.cookies())
+    async def update_cookies(self, browser_context: BrowserContext, urls: Optional[List[str]] = None):
+        """
+        Update cookies from browser context
+        :param browser_context: Browser context
+        :param urls: Optional list of URLs to filter cookies (e.g., ["https://m.weibo.cn"])
+                     If provided, only cookies for these URLs will be retrieved
+        """
+        if urls:
+            cookies = await browser_context.cookies(urls=urls)
+            utils.logger.info(f"[WeiboClient.update_cookies] Updating cookies for specific URLs: {urls}")
+        else:
+            cookies = await browser_context.cookies()
+            utils.logger.info("[WeiboClient.update_cookies] Updating all cookies")
+
+        cookie_str, cookie_dict = utils.convert_cookies(cookies)
         self.headers["Cookie"] = cookie_str
         self.cookie_dict = cookie_dict
+        utils.logger.info(f"[WeiboClient.update_cookies] Cookie updated successfully, total: {len(cookie_dict)} cookies")
 
     async def get_note_by_keyword(
         self,
