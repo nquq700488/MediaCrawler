@@ -20,7 +20,7 @@
 import asyncio
 import json
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 
 import httpx
 from playwright.async_api import BrowserContext, Page
@@ -39,7 +39,7 @@ from .exception import DataFetchError, IPBlockError, NoteNotFoundError
 from .field import SearchNoteType, SearchSortType
 from .help import get_search_id
 from .extractor import XiaoHongShuExtractor
-from .playwright_sign import sign_with_playwright
+from .playwright_sign import sign_with_xhshow
 
 
 class XiaoHongShuClient(AbstractApiClient, ProxyRefreshMixin):
@@ -57,8 +57,12 @@ class XiaoHongShuClient(AbstractApiClient, ProxyRefreshMixin):
         self.proxy = proxy
         self.timeout = timeout
         self.headers = headers
-        self._host = "https://edith.xiaohongshu.com"
-        self._domain = "https://www.xiaohongshu.com"
+        if config.XHS_INTERNATIONAL:
+            self._host = "https://webapi.rednote.com"
+            self._domain = "https://www.rednote.com"
+        else:
+            self._host = "https://edith.xiaohongshu.com"
+            self._domain = "https://www.xiaohongshu.com"
         self.IP_ERROR_STR = "Network connection error, please check network settings or restart"
         self.IP_ERROR_CODE = 300012
         self.NOTE_NOT_FOUND_CODE = -510000
@@ -71,19 +75,16 @@ class XiaoHongShuClient(AbstractApiClient, ProxyRefreshMixin):
         self.init_proxy_pool(proxy_ip_pool)
 
     async def _pre_headers(self, url: str, params: Optional[Dict] = None, payload: Optional[Dict] = None) -> Dict:
-        """Request header parameter signing (using playwright injection method)
+        """请求头参数签名 (使用 xhshow 纯算法)
 
         Args:
-            url: Request URL
-            params: GET request parameters
-            payload: POST request parameters
+            url: 请求 URI path
+            params: GET 请求参数
+            payload: POST 请求参数
 
         Returns:
-            Dict: Signed request header parameters
+            Dict: 签名后的请求头参数
         """
-        a1_value = self.cookie_dict.get("a1", "")
-
-        # Determine request data, method and URI
         if params is not None:
             data = params
             method = "GET"
@@ -93,12 +94,11 @@ class XiaoHongShuClient(AbstractApiClient, ProxyRefreshMixin):
         else:
             raise ValueError("params or payload is required")
 
-        # Generate signature using playwright injection method
-        signs = await sign_with_playwright(
-            page=self.playwright_page,
+        # 使用 xhshow 纯算法生成签名
+        signs = sign_with_xhshow(
             uri=url,
             data=data,
-            a1=a1_value,
+            cookie_str=self.headers.get("Cookie", ""),
             method=method,
         )
 
@@ -152,6 +152,15 @@ class XiaoHongShuClient(AbstractApiClient, ProxyRefreshMixin):
             err_msg = data.get("msg", None) or f"{response.text}"
             raise DataFetchError(err_msg)
 
+    @staticmethod
+    def _build_query_string(params: Dict) -> str:
+        """Build URL query string with encoding matching browser behavior (commas not encoded)"""
+        parts = []
+        for key, value in params.items():
+            value_str = str(value) if value is not None else ""
+            parts.append(f"{key}={quote(value_str, safe=',')}")
+        return "&".join(parts)
+
     async def get(self, uri: str, params: Optional[Dict] = None) -> Dict:
         """
         GET request, signs request headers
@@ -163,10 +172,15 @@ class XiaoHongShuClient(AbstractApiClient, ProxyRefreshMixin):
 
         """
         headers = await self._pre_headers(uri, params)
-        full_url = f"{self._host}{uri}"
+        # Build URL manually to ensure query string encoding matches the sign string
+        # (httpx's default params encoding differs from browser/XHS frontend behavior)
+        if params:
+            full_url = f"{self._host}{uri}?{self._build_query_string(params)}"
+        else:
+            full_url = f"{self._host}{uri}"
 
         return await self.request(
-            method="GET", url=full_url, headers=headers, params=params
+            method="GET", url=full_url, headers=headers
         )
 
     async def post(self, uri: str, data: dict, **kwargs) -> Dict:
@@ -568,6 +582,7 @@ class XiaoHongShuClient(AbstractApiClient, ProxyRefreshMixin):
             "num": page_size,
             "cursor": cursor,
             "user_id": creator,
+            "image_formats": "jpg,webp,avif",
             "xsec_token": xsec_token,
             "xsec_source": xsec_source,
         }
@@ -670,7 +685,7 @@ class XiaoHongShuClient(AbstractApiClient, ProxyRefreshMixin):
 
         """
         url = (
-            "https://www.xiaohongshu.com/explore/"
+            f"{self._domain}/explore/"
             + note_id
             + f"?xsec_token={xsec_token}&xsec_source={xsec_source}"
         )
