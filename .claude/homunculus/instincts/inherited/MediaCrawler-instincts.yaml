@@ -1,0 +1,240 @@
+# Instincts generated from https://github.com/nquq700488/MediaCrawler
+# Generated: 2026-03-23T02:40:20.926Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: MediaCrawler-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Commit Length
+
+## Action
+
+Keep commit messages concise (~38 characters)
+
+## Evidence
+
+- Average commit message length: 38 chars
+- Based on 200 commits
+
+---
+id: MediaCrawler-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Naming Files
+
+## Action
+
+Use snake_case naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: snake_case
+
+---
+id: MediaCrawler-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Export Style
+
+## Action
+
+Prefer default exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: default
+
+---
+id: MediaCrawler-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: MediaCrawler-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.75
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~5x per month
+- Files: **/*.test.*, **/api/**
+
+---
+id: MediaCrawler-workflow-add-or-update-command-line-argument
+trigger: "when doing add or update command line argument"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Workflow Add Or Update Command Line Argument
+
+## Action
+
+Follow the add-or-update-command-line-argument workflow:
+1. Edit cmd_arg/arg.py to add or update the argument.
+2. Optionally update config/base_config.py if a default or config mapping is needed.
+3. If the argument affects platform-specific logic, update related files (e.g., media_platform/xhs/core.py).
+4. If the argument affects storage, update store/* files.
+5. Optionally update documentation (README or docs/).
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: cmd_arg/arg.py, config/base_config.py, media_platform/xhs/core.py
+
+---
+id: MediaCrawler-workflow-add-or-modify-storage-format-or-path
+trigger: "when doing add or modify storage format or path"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Workflow Add Or Modify Storage Format Or Path
+
+## Action
+
+Follow the add-or-modify-storage-format-or-path workflow:
+1. Edit or add methods in tools/async_file_writer.py for new format support.
+2. Update store/*/_store_impl.py and store/*/__init__.py to register/store using the new format.
+3. Update config/base_config.py and/or cmd_arg/arg.py for default format/path.
+4. Update database/db_session.py for new format guards.
+5. Update documentation (docs/data_storage_guide.md, README, etc.).
+6. Add or update tests (e.g., tests/test_store_factory.py).
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: tools/async_file_writer.py, store/bilibili/_store_impl.py, store/bilibili/__init__.py
+
+---
+id: MediaCrawler-workflow-propagate-cross-cutting-config-or-utility-change
+trigger: "when doing propagate cross cutting config or utility change"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Workflow Propagate Cross Cutting Config Or Utility Change
+
+## Action
+
+Follow the propagate-cross-cutting-config-or-utility-change workflow:
+1. Add or update config option in config/base_config.py.
+2. Implement or update a utility in tools/ (e.g., httpx_util.py).
+3. Replace or update usage in all affected platform client files (media_platform/*/client.py).
+4. Update proxy provider files (proxy/providers/*.py, proxy/proxy_ip_pool.py).
+5. Optionally update documentation.
+6. Optionally update tests.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: config/base_config.py, tools/httpx_util.py, tools/crawler_util.py
+
+---
+id: MediaCrawler-workflow-documentation-sync-across-languages
+trigger: "when doing documentation sync across languages"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Workflow Documentation Sync Across Languages
+
+## Action
+
+Follow the documentation-sync-across-languages workflow:
+1. Edit README.md, README_en.md, and README_es.md to update or sync content.
+2. If needed, update docs/* for additional guides.
+3. Optionally update images or metadata.
+4. Commit with a message indicating documentation update or sync.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: README.md, README_en.md, README_es.md
+
+---
+id: MediaCrawler-workflow-platform-specific-client-fix-or-feature
+trigger: "when doing platform specific client fix or feature"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/nquq700488/MediaCrawler
+---
+
+# MediaCrawler Workflow Platform Specific Client Fix Or Feature
+
+## Action
+
+Follow the platform-specific-client-fix-or-feature workflow:
+1. Edit the relevant media_platform/<platform>/client.py file.
+2. If needed, update related files (core.py, exception.py) for the platform.
+3. If related to storage, update store/<platform>/_store_impl.py.
+4. Optionally update tests or documentation.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: media_platform/zhihu/client.py, media_platform/xhs/client.py, media_platform/xhs/core.py
+
